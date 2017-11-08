@@ -36,7 +36,7 @@ unused devices: <none>
 
 > **Note:**
 > Besides you can simply run df command and if you see md devices it means you have software RAID.
-> command => `df -h`, You will see the md devise in partition table.
+> command => `df -h`, You will see the md devices in partition table.
 
 In case of 1:, You have a software RAID, that's it **CASE CLOSED**.
 
