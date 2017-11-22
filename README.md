@@ -300,7 +300,7 @@ the output of the above command should be similar to this.
 Rebuild Progress on Device at Enclosure 8, Slot 2 Completed 0% in x Minutes.
 ```
 
-NOTE: Rebuild in RAID6 is going to take time, for refernce please, see.
+NOTE: Rebuild in RAID6 is going to take time, for reference please, see.
  - http://www.computerweekly.com/feature/RAID-rebuilds-How-do-RAID-rebuilds-work-and-which-is-fastest
  - https://community.spiceworks.com/topic/585368-raid-6-with-2-failed-drives-one-is-rebuilding
 
