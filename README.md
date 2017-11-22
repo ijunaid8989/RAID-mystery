@@ -300,6 +300,19 @@ the output of the above command should be similar to this.
 Rebuild Progress on Device at Enclosure 8, Slot 2 Completed 0% in x Minutes.
 ```
 
+NOTE: Rebuild in RAID6 is going to take time, for refernce please, see.
+ - http://www.computerweekly.com/feature/RAID-rebuilds-How-do-RAID-rebuilds-work-and-which-is-fastest
+ - https://community.spiceworks.com/topic/585368-raid-6-with-2-failed-drives-one-is-rebuilding
+
+
+Cautions and Checks
+===================
+
+1.
+
+If you have 2 drives failed in case of RAID6, then its equal to one failure, also never replace 2 disk together but one at a time, for reference please see https://serverfault.com/questions/306526/raid-6-better-to-replace-two-dead-drives-at-the-same-time-or-one-at-a-time
+
+
 ----------------------
 
 So this was it for now, I am going to share some useful links down below for read and apply, And I will also add more and more commands and information to this doc, In anycase, If you are reading this and founding anything wrong, or want to support the doc by adding infotmation or correction, please make a PR.
