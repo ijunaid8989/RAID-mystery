@@ -202,6 +202,103 @@ Deny Force Failed                       : No
 ```
 
 
+Disk FAILED > 0
+===============
+
+The status of each drive can be checked using this command via SSH root:
+
+1.
+
+```
+/opt/MegaRAID/MegaCli/MegaCli64 -ShowSummary -aALL
+```
+
+The output will be similar to:
+```
+Connector : ##########<Internal><Encl Pos 1 >: Slot 2
+Vendor Id : ##########
+Product Id : ##########
+State : Unconfigured Good
+Disk Type : SAS,Hard Disk Device 
+Capacity : 3.637 TB 
+Power State : Active 
+```
+
+2.
+You need to get the correct enclosure position and slot of the drive by using the following command:
+
+```
+opt/MegaRAID/MegaCli/MegaCli64 -PDList -aALL
+```
+
+Output will be similar to:
+
+```
+Adapter #0 
+[...]
+Enclosure Device ID: 8
+Slot Number: 2
+[...]
+Firmware state: Unconfigured(good), Spun Up
+```
+
+3.
+To get the right Array and Row position of the drive in the RAID array, execute:
+
+```
+/opt/MegaRAID/MegaCli/MegaCli64 -pdgetmissing -aALL
+```
+
+The output will be similar to:
+
+```
+Adapter 0 - Missing Physical drives 
+No. Array Row Size Expected 
+0 0 3 3814697 MB
+```
+4.
+
+Place the missing drive into the RAID array and run this command:
+
+```
+/opt/MegaRAID/MegaCli/MegaCli64 -PdReplaceMissing -PhysDrv [8:2] -Array0 -row3 -a0
+```
+
+Where 8 and 2 in [8:2] are the Enclosure Device ID and slot number respectively, 0 in Array0 is the array number, 3 in row3 is the number of the drive in the RAID array, and 0 in a0 represents the adapter.
+
+Output should be similar to:
+
+```
+Adapter: 0: Missing PD at Array 0, Row 3 is replaced.
+```
+
+5.
+
+To start rebuilding the drive run this command:
+
+```
+/opt/MegaRAID/MegaCli/MegaCli64 -PDRbld -Start -PhysDrv [8:2] -a0
+```
+
+Output should be similar to this:
+
+```
+started rebuild progress on device encl 8 slot 2
+```
+
+6.
+
+To check status on the rebuilding status, run this command:
+
+```
+/opt/MegaRAID/MegaCli/MegaCli64 -PDRbld -ShowProg -PhysDrv [8:2] -a0
+```
+
+the output of the above command should be similar to this.
+
+```
+Rebuild Progress on Device at Enclosure 8, Slot 2 Completed 0% in x Minutes.
+```
 
 ----------------------
 
