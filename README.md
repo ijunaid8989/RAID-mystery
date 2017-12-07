@@ -305,6 +305,140 @@ NOTE: Rebuild in RAID6 is going to take time, for reference please, see.
  - https://community.spiceworks.com/topic/585368-raid-6-with-2-failed-drives-one-is-rebuilding
 
 
+CREATE RAID Array with arcconf cli (RAID Adaptec Series)
+========================================================
+
+The actual status of the RAID may be obtained by using the following command:
+
+```
+arcconf GETCONFIG 1 LD
+```
+But as a fresh hardware, there will be no raid, So Output should be.
+```
+Controllers found: 1
+----------------------------------------------------------------------
+Logical device information
+----------------------------------------------------------------------
+   No logical devices configured
+
+
+Command completed successfully.
+```
+1. Now first of all you need to initialize all of your devices available for RAID, with this command
+
+```
+arcconf TASK START 1 DEVICE ALL INITIALIZE
+```
+
+**NOTE: You can go on with each device name or id but with option of `ALL`, it will initialize all availables.**
+
+Output of the above command should be.
+
+```
+Controllers found: 1
+Initializing Channel 0, Device 4.
+Initializing Channel 0, Device 5.
+......
+......
+Initializing Channel 0, Device 18.
+15 device(s) initialized.
+
+Command completed successfully.
+```
+
+2. Now, here is the tricky and fun part where you are going to create your RAID level, (It is said somewhere that RAID level, 0, 5, 10 are the standards for Adaptec Cotroller, **I dont know why**.), We are going to creat RAID LEVEL 6 using `arcconf`.
+
+As you have the information about Device channel and its ID. Now understand the command.
+
+```
+arcconf CREATE <Controller#> LOGICALDRIVE [Options] <Size> <RAID#> <Channel# ID#>
+```
+
+ - <Controller#>, At line 338, You have found Controller, which is 1.
+ - <Size>, its going to be "max", all available size of disk.
+ - <RAID#>, 6 (or any number you want of RAIL Level e.g 0 or 10 or 5)
+ - <Channel# ID#>, As on line 339, while you intialized all your devices, you got the information about channel and device id as well, so on line 339, you have channel 0 and devcice 4.
+
+Your command for creating the RAID LEVEL will be, 
+
+```
+arcconf CREATE 1 LOGICALDRIVE MAX 6 0 4 0 5 .. 0 18 noprompt
+```
+(Dont get confused with `..` in above command, you are going to place your channel and device ids there til the end of list.)
+
+after raid level option, all pair of digits are your channel and its corresponding device ID. Now run the command. And output should be.
+
+```
+Controllers found: 1
+
+Creating logical device: LogicalDrv 0
+
+Command completed successfully.
+```
+
+**Congratulation**, You have created the RAID 6 on your hardware using arcconf cli.
+
+Now again run the very first command, which you run to check the RAID level and drives.
+
+```
+arcconf GETCONFIG 1 LD
+```
+
+And now you have different output than pervious one as.
+
+```
+Controllers found: 1
+----------------------------------------------------------------------
+Logical device information
+----------------------------------------------------------------------
+Logical Device number 0
+   Logical Device name                      : LogicalDrv 0
+   Block Size of member drives              : 512 Bytes
+   RAID level                               : 6 Reed-Solomon
+   Unique Identifier                        : 383846B3
+   Status of Logical Device                 : Impacted ( Build/Verify with fix : 0 % )
+   Additional details                       : Initialized with Build/Clear
+   Size                                     : 74347510 MB
+   Parity space                             : 11438080 MB
+   Stripe-unit size                         : 256 KB
+   Interface Type                           : Serial ATA
+   Device Type                              : HDD
+   Read-cache setting                       : Enabled
+   Read-cache status                        : On
+   Write-cache setting                      : Enabled
+   Write-cache status                       : On
+   Partitioned                              : No
+   Protected by Hot-Spare                   : No
+   Bootable                                 : Yes
+   Failed stripes                           : No
+   Power settings                           : Disabled
+   --------------------------------------------------------
+   Logical Device segment information
+   --------------------------------------------------------
+   Segment 0                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:0)         87P1Y01VFTTB
+   Segment 1                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:1)         87P1Y01WFTTB
+   Segment 2                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:2)         87P1Y022FTTB
+   Segment 3                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:3)         87P1Y01YFTTB
+   Segment 4                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:4)         87P1Y026FTTB
+   Segment 5                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:5)         87P2Y01WFTTB
+   Segment 6                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:6)         87P1Y01ZFTTB
+   Segment 7                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:7)         87P1Y01UFTTB
+   Segment 8                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:8)         87P1Y01XFTTB
+   Segment 9                                : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:9)         87P1Y01SFTTB
+   Segment 10                               : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:10)         87P1Y01TFTTB
+   Segment 11                               : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:11)         87P1Y020FTTB
+   Segment 12                               : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:12)         87N4Y00KFTTB
+   Segment 13                               : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:13)         87N4Y00JFTTB
+   Segment 14                               : Present (5723166MB, SATA, HDD, Enclosure:0, Slot:14)         87N6Y00RFTTB
+
+Command completed successfully.
+```
+You can see and check the RAID level which is now.
+
+```
+RAID level                               : 6 Reed-Solomon
+```
+
 Cautions and Checks
 ===================
 
